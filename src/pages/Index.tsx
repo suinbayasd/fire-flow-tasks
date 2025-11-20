@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useBoards } from '@/hooks/useBoards';
 import { Header } from '@/components/Header';
@@ -8,16 +7,9 @@ import { CreateBoardModal } from '@/components/CreateBoardModal';
 import { Clock } from 'lucide-react';
 
 const Index = () => {
-  const navigate = useNavigate();
-  const { user, userData, loading: authLoading } = useAuth();
+  const { user, userData } = useAuth();
   const { boards, loading: boardsLoading, createBoard } = useBoards(user?.uid);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    }
-  }, [user, authLoading, navigate]);
 
   const handleCreateBoard = async (title: string, background: string) => {
     if (user) {
@@ -29,7 +21,7 @@ const Index = () => {
     userData?.recentlyViewed?.includes(board.id)
   ).slice(0, 4);
 
-  if (authLoading || boardsLoading) {
+  if (boardsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
