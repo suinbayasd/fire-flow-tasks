@@ -8,45 +8,61 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 210 10% 23%;
+    /* Main Colors - Modern Blue Theme */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 10% 23%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 10% 23%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 200 98% 39%;
+    --primary: 217 100% 50%;
     --primary-foreground: 0 0% 100%;
+    
+    --primary-light: 217 100% 60%;
+    --primary-dark: 217 100% 40%;
 
-    --secondary: 210 14% 89%;
-    --secondary-foreground: 210 10% 23%;
+    --secondary: 210 17% 95%;
+    --secondary-foreground: 215 25% 15%;
 
-    --muted: 210 14% 95%;
-    --muted-foreground: 210 10% 45%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 197 71% 73%;
-    --accent-foreground: 210 10% 23%;
+    --accent: 174 72% 56%;
+    --accent-foreground: 0 0% 100%;
+    
+    --accent-light: 174 72% 66%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 14% 89%;
-    --input: 210 14% 89%;
-    --ring: 200 98% 39%;
+    --border: 214 15% 91%;
+    --input: 214 15% 91%;
+    --ring: 217 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     
-    --gradient-board-1: linear-gradient(135deg, hsl(200, 98%, 39%), hsl(197, 71%, 73%));
-    --gradient-board-2: linear-gradient(135deg, hsl(280, 100%, 70%), hsl(240, 100%, 85%));
-    --gradient-board-3: linear-gradient(135deg, hsl(340, 82%, 52%), hsl(10, 79%, 70%));
-    --gradient-board-4: linear-gradient(135deg, hsl(142, 71%, 45%), hsl(158, 64%, 52%));
-    --gradient-board-5: linear-gradient(135deg, hsl(24, 100%, 50%), hsl(43, 100%, 50%));
+    /* Modern Gradients */
+    --gradient-board-1: linear-gradient(135deg, hsl(217, 100%, 50%) 0%, hsl(174, 72%, 56%) 100%);
+    --gradient-board-2: linear-gradient(135deg, hsl(280, 100%, 65%) 0%, hsl(240, 100%, 75%) 100%);
+    --gradient-board-3: linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(10, 79%, 65%) 100%);
+    --gradient-board-4: linear-gradient(135deg, hsl(142, 71%, 45%) 0%, hsl(174, 72%, 56%) 100%);
+    --gradient-board-5: linear-gradient(135deg, hsl(24, 100%, 50%) 0%, hsl(43, 100%, 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(217, 100%, 50%) 0%, hsl(217, 100%, 60%) 100%);
+    --gradient-accent: linear-gradient(135deg, hsl(174, 72%, 56%) 0%, hsl(174, 72%, 66%) 100%);
     
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.12);
-    --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Enhanced Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-header: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    
+    /* Smooth Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -66,36 +82,43 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 210 10% 23%;
+    --background: 215 25% 10%;
     --foreground: 0 0% 98%;
 
-    --card: 210 10% 18%;
+    --card: 215 25% 14%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 210 10% 18%;
+    --popover: 215 25% 14%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 200 98% 39%;
+    --primary: 217 100% 50%;
     --primary-foreground: 0 0% 100%;
+    
+    --primary-light: 217 100% 60%;
+    --primary-dark: 217 100% 40%;
 
-    --secondary: 210 10% 28%;
+    --secondary: 215 25% 20%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 210 10% 28%;
-    --muted-foreground: 210 10% 65%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 197 71% 73%;
-    --accent-foreground: 210 10% 23%;
+    --accent: 174 72% 56%;
+    --accent-foreground: 0 0% 100%;
+    
+    --accent-light: 174 72% 66%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 10% 28%;
-    --input: 210 10% 28%;
-    --ring: 200 98% 39%;
+    --border: 215 25% 25%;
+    --input: 215 25% 25%;
+    --ring: 217 100% 50%;
     
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -105,6 +128,55 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+}
+
+@layer utilities {
+  .shadow-smooth {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .shadow-smooth-hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-fast {
+    transition: var(--transition-fast);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .glassmorphism {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .dark .glassmorphism {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }

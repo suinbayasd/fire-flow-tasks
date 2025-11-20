@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Droppable, Draggable } from '@hello-pangea/dnd';
-import { Plus, MoreVertical, Trash2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Column, Card } from '@/types';
 import { BoardCardItem } from './BoardCardItem';
 import { Button } from './ui/button';
@@ -57,11 +57,11 @@ export const BoardColumn = ({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className="bg-muted rounded-lg w-72 flex-shrink-0 flex flex-col max-h-full"
+          className="bg-card rounded-xl w-80 flex-shrink-0 flex flex-col max-h-full shadow-card border border-border"
         >
           <div
             {...provided.dragHandleProps}
-            className="p-3 flex items-center justify-between"
+            className="p-4 flex items-center justify-between border-b border-border"
           >
             {isEditingTitle ? (
               <Input
@@ -75,25 +75,28 @@ export const BoardColumn = ({
                     setIsEditingTitle(false);
                   }
                 }}
-                className="h-8"
+                className="h-8 font-semibold"
                 autoFocus
               />
             ) : (
               <h3
-                className="font-semibold text-sm cursor-pointer hover:bg-background/50 px-2 py-1 rounded"
+                className="font-semibold text-base cursor-pointer hover:text-primary transition-smooth px-2 py-1 -ml-2 rounded-lg hover:bg-secondary"
                 onDoubleClick={() => setIsEditingTitle(true)}
               >
                 {column.title}
+                <span className="ml-2 text-xs text-muted-foreground font-normal">
+                  {cards.length}
+                </span>
               </h3>
             )}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreVertical className="w-4 h-4" />
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-secondary">
+                  <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => setIsEditingTitle(true)}>
                   Переименовать
                 </DropdownMenuItem>
@@ -113,8 +116,8 @@ export const BoardColumn = ({
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`flex-1 overflow-y-auto px-3 pb-3 space-y-2 ${
-                  snapshot.isDraggingOver ? 'bg-accent/30' : ''
+                className={`flex-1 overflow-y-auto p-4 space-y-3 min-h-[100px] transition-smooth ${
+                  snapshot.isDraggingOver ? 'bg-primary/5 ring-2 ring-primary/20 ring-inset' : ''
                 }`}
               >
                 {cards.map((card, index) => (
@@ -126,13 +129,18 @@ export const BoardColumn = ({
                   />
                 ))}
                 {provided.placeholder}
+                {cards.length === 0 && !snapshot.isDraggingOver && (
+                  <div className="text-center py-8 text-muted-foreground text-sm">
+                    Перетащите сюда карточку
+                  </div>
+                )}
               </div>
             )}
           </Droppable>
 
-          <div className="p-3">
+          <div className="p-3 border-t border-border">
             {isAddingCard ? (
-              <div className="space-y-2">
+              <div className="space-y-2 animate-fade-in">
                 <Input
                   value={newCardTitle}
                   onChange={(e) => setNewCardTitle(e.target.value)}
@@ -144,10 +152,11 @@ export const BoardColumn = ({
                     }
                   }}
                   placeholder="Введите название карточки..."
+                  className="border-primary/50 focus:border-primary"
                   autoFocus
                 />
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={handleAddCard}>
+                  <Button size="sm" onClick={handleAddCard} disabled={!newCardTitle.trim()}>
                     Добавить
                   </Button>
                   <Button
@@ -166,7 +175,7 @@ export const BoardColumn = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start"
+                className="w-full justify-start hover:bg-primary/10 hover:text-primary"
                 onClick={() => setIsAddingCard(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />

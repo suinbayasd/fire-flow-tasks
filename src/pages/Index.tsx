@@ -4,7 +4,8 @@ import { useBoards } from '@/hooks/useBoards';
 import { Header } from '@/components/Header';
 import { BoardCard } from '@/components/BoardCard';
 import { CreateBoardModal } from '@/components/CreateBoardModal';
-import { Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, Plus } from 'lucide-react';
 
 const Index = () => {
   const { user, userData } = useAuth();
@@ -23,10 +24,10 @@ const Index = () => {
 
   if (boardsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-          <p className="mt-4 text-muted-foreground">Загрузка...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent mx-auto" />
+          <p className="text-lg text-muted-foreground font-medium">Загрузка досок...</p>
         </div>
       </div>
     );
@@ -36,14 +37,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header onCreateBoard={() => setIsCreateModalOpen(true)} />
 
-      <main className="max-w-7xl mx-auto p-6 space-y-8">
+      <main className="max-w-7xl mx-auto p-8 space-y-10">
         {recentBoards.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-5 h-5 text-muted-foreground" />
-              <h2 className="text-lg font-semibold">Недавно просмотренные</h2>
+          <section className="animate-fade-in">
+            <div className="flex items-center gap-3 mb-6">
+              <Clock className="w-6 h-6 text-primary" />
+              <h2 className="text-xl font-semibold">Недавно просмотренные</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {recentBoards.map((board) => (
                 <BoardCard key={board.id} board={board} />
               ))}
@@ -51,22 +52,32 @@ const Index = () => {
           </section>
         )}
 
-        <section>
-          <h2 className="text-lg font-semibold mb-4">Ваши доски</h2>
+        <section className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-xl font-semibold mb-6">Ваши доски</h2>
           {boards.length === 0 ? (
-            <div className="text-center py-12 bg-muted rounded-lg">
-              <p className="text-muted-foreground mb-4">
-                У вас пока нет досок
-              </p>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="text-primary hover:underline font-medium"
-              >
-                Создайте первую доску
-              </button>
+            <div className="text-center py-20 bg-gradient-to-br from-secondary to-muted rounded-2xl border-2 border-dashed border-border">
+              <div className="max-w-md mx-auto space-y-4">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                  <Plus className="w-10 h-10 text-primary" />
+                </div>
+                <p className="text-lg text-muted-foreground">
+                  У вас пока нет досок
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Создайте свою первую доску, чтобы начать организовывать задачи
+                </p>
+                <Button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  size="lg"
+                  className="mt-4"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Создать первую доску
+                </Button>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {boards.map((board) => (
                 <BoardCard key={board.id} board={board} />
               ))}
