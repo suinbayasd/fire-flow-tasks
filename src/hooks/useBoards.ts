@@ -8,7 +8,6 @@ import {
   updateDoc, 
   deleteDoc, 
   doc,
-  orderBy,
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -28,8 +27,7 @@ export const useBoards = (userId: string | undefined) => {
 
     const q = query(
       collection(db, 'boards'),
-      where('ownerId', '==', userId),
-      orderBy('updatedAt', 'desc')
+      where('ownerId', '==', userId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -39,6 +37,13 @@ export const useBoards = (userId: string | undefined) => {
         createdAt: doc.data().createdAt?.toDate(),
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Board[];
+      
+      // Sort on client side to avoid index requirements
+      boardsData.sort((a, b) => {
+        const dateA = a.updatedAt?.getTime() || 0;
+        const dateB = b.updatedAt?.getTime() || 0;
+        return dateB - dateA;
+      });
       
       setBoards(boardsData);
       setLoading(false);

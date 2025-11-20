@@ -8,7 +8,6 @@ import {
   updateDoc, 
   deleteDoc, 
   doc,
-  orderBy,
   Timestamp 
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -28,8 +27,7 @@ export const useCards = (boardId: string | undefined) => {
 
     const q = query(
       collection(db, 'cards'),
-      where('boardId', '==', boardId),
-      orderBy('order', 'asc')
+      where('boardId', '==', boardId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -39,6 +37,9 @@ export const useCards = (boardId: string | undefined) => {
         createdAt: doc.data().createdAt?.toDate(),
         updatedAt: doc.data().updatedAt?.toDate(),
       })) as Card[];
+      
+      // Sort on client side to avoid index requirements
+      cardsData.sort((a, b) => a.order - b.order);
       
       setCards(cardsData);
       setLoading(false);
