@@ -44,49 +44,52 @@ export const CardModal = ({ card, open, onClose, onUpdateCard, onDeleteCard }: C
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl animate-scale-in">
         <DialogHeader>
-          <DialogTitle>Редактирование карточки</DialogTitle>
+          <DialogTitle className="text-2xl">Редактирование карточки</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="card-title">Название</Label>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="card-title" className="text-base font-semibold">Название</Label>
             <Input
               id="card-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Введите название..."
+              placeholder="Введите название карточки..."
+              className="h-11 text-base"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="card-description">Описание</Label>
+          <div className="space-y-3">
+            <Label htmlFor="card-description" className="text-base font-semibold">Описание</Label>
             <Textarea
               id="card-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Добавьте подробное описание..."
-              rows={6}
+              placeholder="Добавьте подробное описание задачи..."
+              rows={8}
+              className="text-base resize-none"
             />
           </div>
 
-          <div className="flex gap-2 justify-between">
+          <div className="flex gap-3 justify-between pt-4 border-t border-border">
             <Button
               variant="destructive"
               size="sm"
               onClick={handleDelete}
+              className="px-4"
             >
               <Trash2 className="w-4 h-4 mr-2" />
-              Удалить
+              Удалить карточку
             </Button>
             
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={onClose}>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={onClose} className="px-6">
                 Отмена
               </Button>
-              <Button onClick={handleSave} disabled={!title.trim()}>
-                Сохранить
+              <Button onClick={handleSave} disabled={!title.trim()} className="px-6">
+                Сохранить изменения
               </Button>
             </div>
           </div>

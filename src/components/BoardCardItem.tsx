@@ -16,13 +16,13 @@ export const BoardCardItem = ({ card, index, onClick }: BoardCardItemProps) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           onClick={onClick}
-          className={`bg-card rounded-lg p-3 shadow-card hover:shadow-card-hover cursor-pointer transition-all ${
-            snapshot.isDragging ? 'rotate-2 scale-105' : ''
+          className={`bg-card rounded-lg p-4 shadow-sm hover:shadow-md cursor-pointer transition-smooth border border-border hover:border-primary/30 group ${
+            snapshot.isDragging ? 'rotate-2 scale-105 shadow-lg ring-2 ring-primary/20' : ''
           }`}
         >
-          <p className="text-sm font-medium">{card.title}</p>
+          <p className="text-sm font-medium leading-snug group-hover:text-primary transition-smooth">{card.title}</p>
           {card.description && (
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+            <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
               {card.description}
             </p>
           )}
