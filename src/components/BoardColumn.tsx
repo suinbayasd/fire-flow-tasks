@@ -16,7 +16,7 @@ interface BoardColumnProps {
   column: Column;
   cards: Card[];
   index: number;
-  onCreateCard: (columnId: string) => void;
+  onCreateCard: (columnId: string, cardTitle: string) => Promise<void>;
   onUpdateColumn: (columnId: string, title: string) => void;
   onDeleteColumn: (columnId: string) => void;
   onCardClick: (card: Card) => void;
@@ -43,9 +43,10 @@ export const BoardColumn = ({
     setIsEditingTitle(false);
   };
 
-  const handleAddCard = () => {
-    if (newCardTitle.trim()) {
-      onCreateCard(column.id);
+  const handleAddCard = async () => {
+    const cardTitle = newCardTitle.trim();
+    if (cardTitle) {
+      await onCreateCard(column.id, cardTitle);
       setNewCardTitle('');
       setIsAddingCard(false);
     }
