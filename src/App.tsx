@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Board from "./pages/Board";
-import Auth from "./pages/Auth";
+import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +22,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return user ? <>{children}</> : <Navigate to="/auth" replace />;
+  return user ? <>{children}</> : <Navigate to="/welcome" replace />;
 };
 
 const App = () => (
@@ -32,7 +32,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <Routes>
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/welcome" element={<Landing />} />
           <Route
             path="/"
             element={

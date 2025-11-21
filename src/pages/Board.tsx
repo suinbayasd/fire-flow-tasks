@@ -114,11 +114,11 @@ const Board = () => {
     }
   };
 
-  const handleCreateCard = async (columnId: string) => {
+  const handleCreateCard = async (columnId: string, cardTitle: string) => {
     const columnCards = cards.filter(card => card.columnId === columnId);
     const newOrder = columnCards.length;
     if (boardId) {
-      await createCard('Новая карточка', columnId, boardId, newOrder);
+      await createCard(cardTitle, columnId, boardId, newOrder);
     }
   };
 
