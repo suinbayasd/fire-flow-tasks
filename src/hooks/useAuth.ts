@@ -43,7 +43,8 @@ export const useAuth = () => {
         id: userCredential.user.uid,
         name,
         email,
-        recentlyViewed: []
+        recentlyViewed: [],
+        favorites: []
       });
 
       toast({

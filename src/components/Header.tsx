@@ -1,65 +1,82 @@
-import { Search, Plus, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
-import { useAuth } from '@/hooks/useAuth';
+import { Plus, LogOut } from 'lucide-react';
+import { SearchBar } from './SearchBar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface HeaderProps {
   onCreateBoard: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
-export const Header = ({ onCreateBoard }: HeaderProps) => {
+export const Header = ({ onCreateBoard, searchQuery = '', onSearchChange }: HeaderProps) => {
   const { userData, signOut } = useAuth();
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
-    <header className="bg-card border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-card/95">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              TaskFlow
-            </h1>
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Поиск досок..." 
-                className="pl-10 pr-4 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-72 transition-smooth"
-              />
-            </div>
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-8">
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent whitespace-nowrap">
+            TaskFlow
+          </h1>
+        </div>
+
+        {onSearchChange && (
+          <div className="flex-1 max-w-md hidden md:block">
+            <SearchBar 
+              value={searchQuery} 
+              onChange={onSearchChange}
+              placeholder="Поиск досок и карточек..."
+            />
           </div>
-          
-          <div className="flex items-center gap-3">
-            <Button 
-              onClick={onCreateBoard}
-              size="sm"
-              className="shadow-sm hover:shadow-md"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Создать доску
-            </Button>
-            
-            <div className="relative group">
-              <Avatar className="cursor-pointer ring-2 ring-transparent group-hover:ring-primary/20 transition-smooth">
-                <AvatarFallback className="bg-gradient-primary text-primary-foreground font-semibold">
-                  {userData?.name?.charAt(0).toUpperCase() || <User className="w-4 h-4" />}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="absolute right-0 mt-3 w-56 bg-card rounded-xl shadow-lg border border-border py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-smooth animate-fade-in">
-                <div className="px-4 py-3 border-b border-border">
-                  <p className="font-semibold text-sm">{userData?.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{userData?.email}</p>
-                </div>
-                <button 
-                  onClick={signOut}
-                  className="w-full text-left px-4 py-2.5 text-sm hover:bg-secondary transition-fast flex items-center gap-2 text-destructive"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Выйти
-                </button>
+        )}
+
+        <div className="flex items-center gap-4">
+          <Button 
+            onClick={onCreateBoard}
+            className="shadow-elegant hover:shadow-glow transition-smooth"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Создать доску</span>
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="focus:outline-none">
+                <Avatar className="h-9 w-9 border-2 border-primary/20 hover:border-primary/40 transition-smooth cursor-pointer">
+                  <AvatarFallback className="bg-gradient-primary text-white text-sm font-semibold">
+                    {userData?.name ? getInitials(userData.name) : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 animate-scale-in">
+              <div className="px-2 py-1.5 text-sm">
+                <p className="font-semibold">{userData?.name}</p>
+                <p className="text-xs text-muted-foreground">{userData?.email}</p>
               </div>
-            </div>
-          </div>
+              <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive cursor-pointer">
+                <LogOut className="w-4 h-4 mr-2" />
+                Выйти
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
