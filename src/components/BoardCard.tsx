@@ -1,13 +1,21 @@
 import { Board } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BoardCardProps {
   board: Board;
+  isFavorite?: boolean;
+  onToggleFavorite?: (boardId: string) => void;
 }
 
-export const BoardCard = ({ board }: BoardCardProps) => {
+export const BoardCard = ({ board, isFavorite = false, onToggleFavorite }: BoardCardProps) => {
   const navigate = useNavigate();
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleFavorite?.(board.id);
+  };
 
   return (
     <div
@@ -25,14 +33,20 @@ export const BoardCard = ({ board }: BoardCardProps) => {
           <h3 className="text-white font-semibold text-lg drop-shadow-lg line-clamp-2">
             {board.title}
           </h3>
-          <button 
-            className="opacity-0 group-hover:opacity-100 transition-smooth p-1.5 hover:bg-white/20 rounded-lg"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <Star className="w-4 h-4 text-white" />
-          </button>
+          {onToggleFavorite && (
+            <button 
+              className={cn(
+                "transition-smooth p-1.5 hover:bg-white/20 rounded-lg",
+                isFavorite ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              )}
+              onClick={handleFavoriteClick}
+            >
+              <Star className={cn(
+                "w-4 h-4 transition-smooth",
+                isFavorite ? "fill-yellow-400 text-yellow-400" : "text-white"
+              )} />
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-2 text-white/90 text-xs">
           <div className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-md">

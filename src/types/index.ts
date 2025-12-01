@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   recentlyViewed: string[];
+  favorites: string[];
 }
 
 export interface Board {
