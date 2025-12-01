@@ -6,10 +6,11 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { User } from '@/types';
 import { toast } from '@/hooks/use-toast';
+import { migrateUserData } from '@/utils/migrateUserData';
 
 export const useAuth = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -21,9 +22,21 @@ export const useAuth = () => {
       setUser(firebaseUser);
       
       if (firebaseUser) {
+        // Migrate user data if needed
+        await migrateUserData(firebaseUser.uid);
+        
         const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
         if (userDoc.exists()) {
-          setUserData(userDoc.data() as User);
+          const data = userDoc.data() as User;
+          // Ensure favorites field exists
+          if (!data.favorites) {
+            await updateDoc(doc(db, 'users', firebaseUser.uid), {
+              favorites: []
+            });
+            setUserData({ ...data, favorites: [] });
+          } else {
+            setUserData(data);
+          }
         }
       } else {
         setUserData(null);
