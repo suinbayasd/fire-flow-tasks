@@ -4,11 +4,13 @@ import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import { useAuth } from '@/hooks/useAuth';
 import { useColumns } from '@/hooks/useColumns';
 import { useCards } from '@/hooks/useCards';
-import { doc, getDoc, updateDoc, arrayUnion, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Board as BoardType, Card } from '@/types';
+import { Board as BoardType, Card, BoardMember, MemberRole } from '@/types';
 import { BoardColumn } from '@/components/BoardColumn';
 import { CardModal } from '@/components/CardModal';
+import { BoardMembers } from '@/components/BoardMembers';
+import { InviteMemberModal } from '@/components/InviteMemberModal';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -23,6 +25,7 @@ const Board = () => {
   const [board, setBoard] = useState<BoardType | null>(null);
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,12 +35,16 @@ const Board = () => {
       try {
         const boardDoc = await getDoc(doc(db, 'boards', boardId));
         if (boardDoc.exists()) {
-          const boardData = {
-            id: boardDoc.id,
-            ...boardDoc.data(),
-            createdAt: boardDoc.data().createdAt?.toDate(),
-            updatedAt: boardDoc.data().updatedAt?.toDate(),
-          } as BoardType;
+        const boardData = {
+          id: boardDoc.id,
+          ...boardDoc.data(),
+          // Ensure members is always an array of BoardMember objects
+          members: Array.isArray(boardDoc.data().members) ? 
+            (typeof boardDoc.data().members[0] === 'string' ? [] : boardDoc.data().members) : 
+            [],
+          createdAt: boardDoc.data().createdAt?.toDate(),
+          updatedAt: boardDoc.data().updatedAt?.toDate(),
+        } as BoardType;
           setBoard(boardData);
 
           // Update recently viewed
@@ -127,6 +134,95 @@ const Board = () => {
     setIsCardModalOpen(true);
   };
 
+  const handleInviteMember = async (userId: string, role: MemberRole) => {
+    if (!boardId || !board) return;
+
+    try {
+      const newMember: BoardMember = {
+        userId,
+        role,
+        addedAt: new Date()
+      };
+
+      const boardRef = doc(db, 'boards', boardId);
+      const currentMembers = board.members || [];
+      
+      await updateDoc(boardRef, {
+        members: [...currentMembers, newMember]
+      });
+
+      setBoard({
+        ...board,
+        members: [...currentMembers, newMember]
+      });
+    } catch (error) {
+      console.error('Error inviting member:', error);
+      throw error;
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!boardId || !board) return;
+
+    try {
+      const boardRef = doc(db, 'boards', boardId);
+      const updatedMembers = board.members.filter(m => m.userId !== userId);
+      
+      await updateDoc(boardRef, {
+        members: updatedMembers
+      });
+
+      setBoard({
+        ...board,
+        members: updatedMembers
+      });
+
+      toast({
+        title: "Участник удален",
+        description: "Участник успешно удален из доски",
+      });
+    } catch (error) {
+      console.error('Error removing member:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить участника",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateMemberRole = async (userId: string, role: MemberRole) => {
+    if (!boardId || !board) return;
+
+    try {
+      const boardRef = doc(db, 'boards', boardId);
+      const updatedMembers = board.members.map(m => 
+        m.userId === userId ? { ...m, role } : m
+      );
+      
+      await updateDoc(boardRef, {
+        members: updatedMembers
+      });
+
+      setBoard({
+        ...board,
+        members: updatedMembers
+      });
+
+      toast({
+        title: "Роль обновлена",
+        description: "Роль участника успешно изменена",
+      });
+    } catch (error) {
+      console.error('Error updating member role:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить роль",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -150,7 +246,7 @@ const Board = () => {
       }}
     >
       <header className="bg-black/20 backdrop-blur-sm text-white p-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <div className="flex items-center justify-between max-w-7xl mx-auto gap-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -164,19 +260,30 @@ const Board = () => {
             <h1 className="text-2xl font-bold">{board.title}</h1>
           </div>
 
-          <Button
-            size="sm"
-            onClick={() => {
-              const newOrder = columns.length;
-              if (boardId) {
-                createColumn('Новая колонка', boardId, newOrder);
-              }
-            }}
-            className="bg-white/20 hover:bg-white/30 text-white border-none"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Добавить колонку
-          </Button>
+          <div className="flex items-center gap-3">
+            <BoardMembers
+              members={board.members || []}
+              ownerId={board.ownerId}
+              currentUserId={user?.uid || ''}
+              onInvite={() => setIsInviteModalOpen(true)}
+              onRemoveMember={handleRemoveMember}
+              onUpdateRole={handleUpdateMemberRole}
+            />
+
+            <Button
+              size="sm"
+              onClick={() => {
+                const newOrder = columns.length;
+                if (boardId) {
+                  createColumn('Новая колонка', boardId, newOrder);
+                }
+              }}
+              className="bg-white/20 hover:bg-white/30 text-white border-none"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Добавить колонку
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -217,6 +324,14 @@ const Board = () => {
         }}
         onUpdateCard={updateCard}
         onDeleteCard={deleteCard}
+      />
+
+      <InviteMemberModal
+        open={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onInviteMember={handleInviteMember}
+        currentMembers={board.members || []}
+        ownerId={board.ownerId}
       />
     </div>
   );
