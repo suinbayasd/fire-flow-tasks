@@ -6,12 +6,20 @@ export interface User {
   favorites: string[];
 }
 
+export type MemberRole = 'owner' | 'editor' | 'viewer';
+
+export interface BoardMember {
+  userId: string;
+  role: MemberRole;
+  addedAt: Date;
+}
+
 export interface Board {
   id: string;
   title: string;
   background: string;
   ownerId: string;
-  members: string[];
+  members: BoardMember[];
   createdAt: Date;
   updatedAt: Date;
 }

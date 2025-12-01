@@ -31,12 +31,19 @@ export const useBoards = (userId: string | undefined) => {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const boardsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        updatedAt: doc.data().updatedAt?.toDate(),
-      })) as Board[];
+      const boardsData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          // Ensure members is always an array of BoardMember objects
+          members: Array.isArray(data.members) ? 
+            (typeof data.members[0] === 'string' ? [] : data.members) : 
+            [],
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+        };
+      }) as Board[];
       
       // Sort on client side to avoid index requirements
       boardsData.sort((a, b) => {
@@ -67,7 +74,7 @@ export const useBoards = (userId: string | undefined) => {
         title,
         background,
         ownerId,
-        members: [ownerId],
+        members: [],
         createdAt: now,
         updatedAt: now,
       });
