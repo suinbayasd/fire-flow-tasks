@@ -14,6 +14,20 @@ import { db } from '@/lib/firebase';
 import { Board } from '@/types';
 import { toast } from '@/hooks/use-toast';
 
+const parseBoard = (docSnapshot: any): Board => {
+  const data = docSnapshot.data();
+  return {
+    id: docSnapshot.id,
+    ...data,
+    members: Array.isArray(data.members) ? 
+      (typeof data.members[0] === 'string' ? [] : data.members) : 
+      [],
+    memberIds: Array.isArray(data.memberIds) ? data.memberIds : [],
+    createdAt: data.createdAt?.toDate(),
+    updatedAt: data.updatedAt?.toDate(),
+  } as Board;
+};
+
 export const useBoards = (userId: string | undefined) => {
   const [boards, setBoards] = useState<Board[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,46 +39,74 @@ export const useBoards = (userId: string | undefined) => {
       return;
     }
 
-    const q = query(
+    // Query for boards where user is owner
+    const ownedQuery = query(
       collection(db, 'boards'),
       where('ownerId', '==', userId)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const boardsData = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          // Ensure members is always an array of BoardMember objects
-          members: Array.isArray(data.members) ? 
-            (typeof data.members[0] === 'string' ? [] : data.members) : 
-            [],
-          createdAt: data.createdAt?.toDate(),
-          updatedAt: data.updatedAt?.toDate(),
-        };
-      }) as Board[];
+    // Query for boards where user is a member
+    const memberQuery = query(
+      collection(db, 'boards'),
+      where('memberIds', 'array-contains', userId)
+    );
+
+    let ownedBoards: Board[] = [];
+    let memberBoards: Board[] = [];
+    let ownedLoaded = false;
+    let memberLoaded = false;
+
+    const updateBoards = () => {
+      if (!ownedLoaded || !memberLoaded) return;
       
-      // Sort on client side to avoid index requirements
-      boardsData.sort((a, b) => {
+      // Combine and deduplicate boards
+      const allBoards = [...ownedBoards];
+      memberBoards.forEach(board => {
+        if (!allBoards.find(b => b.id === board.id)) {
+          allBoards.push(board);
+        }
+      });
+      
+      // Sort by updatedAt
+      allBoards.sort((a, b) => {
         const dateA = a.updatedAt?.getTime() || 0;
         const dateB = b.updatedAt?.getTime() || 0;
         return dateB - dateA;
       });
       
-      setBoards(boardsData);
+      setBoards(allBoards);
       setLoading(false);
+    };
+
+    const unsubscribeOwned = onSnapshot(ownedQuery, (snapshot) => {
+      ownedBoards = snapshot.docs.map(parseBoard);
+      ownedLoaded = true;
+      updateBoards();
     }, (error) => {
-      console.error('Error fetching boards:', error);
+      console.error('Error fetching owned boards:', error);
       toast({
         title: "Ошибка загрузки досок",
         description: error.message,
         variant: "destructive",
       });
-      setLoading(false);
+      ownedLoaded = true;
+      updateBoards();
     });
 
-    return unsubscribe;
+    const unsubscribeMember = onSnapshot(memberQuery, (snapshot) => {
+      memberBoards = snapshot.docs.map(parseBoard);
+      memberLoaded = true;
+      updateBoards();
+    }, (error) => {
+      console.error('Error fetching shared boards:', error);
+      memberLoaded = true;
+      updateBoards();
+    });
+
+    return () => {
+      unsubscribeOwned();
+      unsubscribeMember();
+    };
   }, [userId]);
 
   const createBoard = async (title: string, background: string, ownerId: string) => {
@@ -75,6 +117,7 @@ export const useBoards = (userId: string | undefined) => {
         background,
         ownerId,
         members: [],
+        memberIds: [], // For array-contains queries
         createdAt: now,
         updatedAt: now,
       });
