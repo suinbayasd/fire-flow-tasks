@@ -35,15 +35,16 @@ const Board = () => {
       try {
         const boardDoc = await getDoc(doc(db, 'boards', boardId));
         if (boardDoc.exists()) {
+        const data = boardDoc.data();
         const boardData = {
           id: boardDoc.id,
-          ...boardDoc.data(),
-          // Ensure members is always an array of BoardMember objects
-          members: Array.isArray(boardDoc.data().members) ? 
-            (typeof boardDoc.data().members[0] === 'string' ? [] : boardDoc.data().members) : 
+          ...data,
+          members: Array.isArray(data.members) ? 
+            (typeof data.members[0] === 'string' ? [] : data.members) : 
             [],
-          createdAt: boardDoc.data().createdAt?.toDate(),
-          updatedAt: boardDoc.data().updatedAt?.toDate(),
+          memberIds: Array.isArray(data.memberIds) ? data.memberIds : [],
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
         } as BoardType;
           setBoard(boardData);
 
@@ -134,26 +135,29 @@ const Board = () => {
     setIsCardModalOpen(true);
   };
 
-  const handleInviteMember = async (userId: string, role: MemberRole) => {
+  const handleInviteMember = async (memberId: string, role: MemberRole) => {
     if (!boardId || !board) return;
 
     try {
       const newMember: BoardMember = {
-        userId,
+        userId: memberId,
         role,
         addedAt: new Date()
       };
 
       const boardRef = doc(db, 'boards', boardId);
       const currentMembers = board.members || [];
+      const currentMemberIds = board.memberIds || [];
       
       await updateDoc(boardRef, {
-        members: [...currentMembers, newMember]
+        members: [...currentMembers, newMember],
+        memberIds: [...currentMemberIds, memberId] // For array-contains queries
       });
 
       setBoard({
         ...board,
-        members: [...currentMembers, newMember]
+        members: [...currentMembers, newMember],
+        memberIds: [...currentMemberIds, memberId]
       });
     } catch (error) {
       console.error('Error inviting member:', error);
@@ -161,20 +165,23 @@ const Board = () => {
     }
   };
 
-  const handleRemoveMember = async (userId: string) => {
+  const handleRemoveMember = async (memberId: string) => {
     if (!boardId || !board) return;
 
     try {
       const boardRef = doc(db, 'boards', boardId);
-      const updatedMembers = board.members.filter(m => m.userId !== userId);
+      const updatedMembers = board.members.filter(m => m.userId !== memberId);
+      const updatedMemberIds = (board.memberIds || []).filter(id => id !== memberId);
       
       await updateDoc(boardRef, {
-        members: updatedMembers
+        members: updatedMembers,
+        memberIds: updatedMemberIds
       });
 
       setBoard({
         ...board,
-        members: updatedMembers
+        members: updatedMembers,
+        memberIds: updatedMemberIds
       });
 
       toast({

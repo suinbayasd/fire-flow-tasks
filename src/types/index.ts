@@ -20,6 +20,7 @@ export interface Board {
   background: string;
   ownerId: string;
   members: BoardMember[];
+  memberIds: string[]; // For Firestore array-contains queries
   createdAt: Date;
   updatedAt: Date;
 }
